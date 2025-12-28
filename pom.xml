@@ -6,7 +6,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.hecate</groupId>
+    <groupId>hecate</groupId>
     <artifactId>hecate</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -80,8 +80,8 @@
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
-                                        <Premain-Class>com.hecate.agent.HecateAgent</Premain-Class>
-                                        <Agent-Class>com.hecate.agent.HecateAgent</Agent-Class>
+                                        <Premain-Class>hecate.agent.HecateAgent</Premain-Class>
+                                        <Agent-Class>hecate.agent.HecateAgent</Agent-Class>
                                         <Can-Retransform-Classes>true</Can-Retransform-Classes>
                                         <Can-Redefine-Classes>true</Can-Redefine-Classes>
                                     </manifestEntries>
