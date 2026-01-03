@@ -4,13 +4,13 @@ import net.bytebuddy.jar.asm.*;
 
 import java.util.Stack;
 
-public class SynchronisedBlockTransformer extends MethodVisitor {
+public class SynchronizedBlockTransformer extends MethodVisitor {
 
     private final Stack<Integer> lockVariables = new Stack<>();
     private boolean justStoredLockVariable = false;
     private int lastStoredVariable = -1;
 
-    public SynchronisedBlockTransformer(int api, MethodVisitor methodVisitor) {
+    public SynchronizedBlockTransformer(int api, MethodVisitor methodVisitor) {
         super(api, methodVisitor);
     }
 

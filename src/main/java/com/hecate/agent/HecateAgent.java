@@ -3,8 +3,11 @@ package com.hecate.agent;
 import com.hecate.events.EventCollector;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.asm.Advice;
+import net.bytebuddy.asm.AsmVisitorWrapper;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.DynamicType;
+import net.bytebuddy.jar.asm.MethodVisitor;
+import net.bytebuddy.jar.asm.Opcodes;
 import net.bytebuddy.matcher.ElementMatchers;
 import net.bytebuddy.utility.JavaModule;
 
@@ -40,7 +43,17 @@ public class HecateAgent {
                 .transform(new AgentBuilder.Transformer() {
                     @Override
                     public DynamicType.Builder<?> transform(DynamicType.Builder<?> builder, TypeDescription typeDescription, ClassLoader classLoader, JavaModule module, ProtectionDomain domain) {
-                        return builder.visit(Advice.to(SynchronizedMethodInterceptor.class).on(ElementMatchers.isSynchronized()));
+                        builder = builder.visit(Advice.to(SynchronizedMethodInterceptor.class).on(ElementMatchers.isSynchronized()));
+                        builder = builder
+                                .visit(new AsmVisitorWrapper.ForDeclaredMethods()
+                                        .method(ElementMatchers.any(), new AsmVisitorWrapper.ForDeclaredMethods.MethodVisitorWrapper() {
+                                                    @Override
+                                                    public MethodVisitor wrap(TypeDescription instrumentedType, net.bytebuddy.description. method.MethodDescription instrumentedMethod, MethodVisitor methodVisitor, net.bytebuddy.implementation. Implementation.Context implementationContext, net.bytebuddy.pool.TypePool typePool, int writerFlags, int readerFlags) {
+                                                        return new SynchronizedBlockTransformer(Opcodes.ASM9, methodVisitor);
+                                                    }
+                                                })
+                                );
+                        return builder;
                     }
                 })
 
