@@ -7,7 +7,7 @@ public class LockReleaseEvent extends Event{
     private final long holdDuration;
 
     public LockReleaseEvent(long timestamp, long threadId, String threadName, String lockId, String lockClass, long holdDuration) {
-        super(timestamp, EventType.LOCK_WAIT, threadName, threadId);
+        super(timestamp, EventType.LOCK_RELEASE, threadName, threadId);
         this.lockId = lockId;
         this.lockClass = lockClass;
         this.holdDuration = holdDuration;

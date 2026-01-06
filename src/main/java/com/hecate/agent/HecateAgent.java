@@ -1,6 +1,7 @@
 package com.hecate.agent;
 
 import com.hecate.events.EventCollector;
+import com.hecate.events.EventExporter;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.asm.AsmVisitorWrapper;
@@ -26,6 +27,8 @@ public class HecateAgent {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             EventCollector.getInstance().stopCollecting();
             System.out.println("[Hecate] Captured " + EventCollector.getInstance().getEventCount() + " events");
+            EventExporter.exportToFile(EventCollector.getInstance().getEvents(), "hecate-events.json");
+            System.out.println("[Hecate] Events exported to >> hecate-events.json <<");
         }));
 
         new AgentBuilder.Default()
