@@ -1,8 +1,9 @@
 package com.hecate.events;
 
+import com.hecate.util.EventExporter;
+import com.hecate.util.EventLoader;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class EventLoaderTest {
@@ -18,7 +19,7 @@ class EventLoaderTest {
         );
 
         String filename = "test-events.json";
-        String filePath = com.hecate.events.EventExporter.exportToFile(originalEvents, filename);
+        String filePath = EventExporter.exportToFile(originalEvents, filename);
         assertNotNull(filePath);
 
         List<Event> loadedEvents = EventLoader.loadFromFile(filename);
@@ -85,7 +86,7 @@ class EventLoaderTest {
         );
 
         String filename = "test-events-multithread.json";
-        com.hecate.events.EventExporter.exportToFile(originalEvents, filename);
+        EventExporter.exportToFile(originalEvents, filename);
 
         List<Event> loadedEvents = EventLoader.loadAndSummarize(filename);
 

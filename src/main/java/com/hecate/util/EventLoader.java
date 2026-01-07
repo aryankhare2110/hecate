@@ -1,7 +1,8 @@
-package com.hecate.events;
+package com.hecate.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.hecate.events.*;
 
 import java.io.File;
 import java.io.IOException;

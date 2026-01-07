@@ -1,7 +1,7 @@
 package com.hecate.agent;
 
 import com.hecate.events.EventCollector;
-import com.hecate.events.EventExporter;
+import com.hecate.util.EventExporter;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.asm.AsmVisitorWrapper;

@@ -41,7 +41,7 @@ public class SynchronizedBlockTransformer extends MethodVisitor {
 
         else if (opcode == Opcodes.MONITOREXIT) {
             super.visitInsn(Opcodes.DUP);
-            super.visitMethodInsn(Opcodes. INVOKESTATIC, "com/hecate/agent/MonitorHelper", "beforeMonitorExit", "(Ljava/lang/Object;)V", false);
+            super.visitMethodInsn(Opcodes. INVOKESTATIC, "com/hecate/testapps/MonitorHelper", "beforeMonitorExit", "(Ljava/lang/Object;)V", false);
             super.visitInsn(opcode);
 
             if (!lockVariables.isEmpty()) {
