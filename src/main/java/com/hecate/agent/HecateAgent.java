@@ -19,6 +19,7 @@ public class HecateAgent {
 
     public static void premain(String agentArgs, Instrumentation inst) {
 
+        System.setProperty("net.bytebuddy.experimental", "true");
         System.out.println("[Hecate] Agent started");
         System.out.println("[Hecate] Runtime concurrency analysis active");
 
@@ -39,7 +40,9 @@ public class HecateAgent {
                         .or(ElementMatchers.nameStartsWith("com.sun."))
                         .or(ElementMatchers.nameStartsWith("jdk."))
                         .or(ElementMatchers.nameStartsWith("net.bytebuddy."))
-                        .or(ElementMatchers.nameStartsWith("com.hecate.")))
+                        .or(ElementMatchers.nameStartsWith("com.hecate.agent."))
+                        .or(ElementMatchers.nameStartsWith("com.hecate.events."))
+                        .or(ElementMatchers.nameStartsWith("com.hecate.util.")))
 
                 .type(ElementMatchers.any())
 

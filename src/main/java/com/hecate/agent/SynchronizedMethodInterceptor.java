@@ -6,22 +6,13 @@ import net.bytebuddy.asm.Advice;
 public class SynchronizedMethodInterceptor {
 
     @Advice.OnMethodEnter
-    public static long onEnter (@Advice.This(optional = true) Object lockObject) {
+    public static long onEnter(@Advice.This(optional = true) Object lockObject) {
         try {
             long timestamp = System.nanoTime();
             Thread currentThread = Thread.currentThread();
-            String lockId = generateLockId(lockObject);
-            String lockClass;
-
-            if (lockObject != null) {
-                lockClass = lockObject.getClass().getName();
-            }
-            else {
-                lockClass = "static-lock";
-            }
-
+            String lockId = lockObject == null ? "static-lock" : "lock@" + Integer.toHexString(System.identityHashCode(lockObject));
+            String lockClass = lockObject == null ? "static-lock" : lockObject.getClass().getName();
             EventCollector.getInstance().recordEvent(new LockAcquireEvent(timestamp, currentThread.getId(), currentThread.getName(), lockId, lockClass));
-
             return timestamp;
         } catch (Throwable t) {
             System.err.println("[Hecate] Error in onEnter: " + t.getMessage());
@@ -34,29 +25,12 @@ public class SynchronizedMethodInterceptor {
         try {
             long timestamp = System.nanoTime();
             Thread currentThread = Thread.currentThread();
-            String lockId = generateLockId(lockObject);
-            String lockClass;
-
-            if (lockObject != null) {
-                lockClass = lockObject.getClass().getName();
-            }
-            else {
-                lockClass = "static-lock";
-            }
-
+            String lockId = lockObject == null ? "static-lock" : "lock@" + Integer.toHexString(System.identityHashCode(lockObject));
+            String lockClass = lockObject == null ? "static-lock" : lockObject.getClass().getName();
             long holdDuration = timestamp - enterTimestamp;
             EventCollector.getInstance().recordEvent(new LockReleaseEvent(timestamp, currentThread.getId(), currentThread.getName(), lockId, lockClass, holdDuration));
         } catch (Throwable t) {
             System.err.println("[Hecate] Error in onExit: " + t.getMessage());
-        }
-    }
-
-    private static String generateLockId(Object lockObject) {
-        if (lockObject == null) {
-            return "static-lock";
-        }
-        else {
-            return "lock@" + Integer.toHexString(System.identityHashCode(lockObject));
         }
     }
 

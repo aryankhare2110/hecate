@@ -1,0 +1,601 @@
+[ {
+  "timestamp" : 2544312414708,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544319002416,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 6587708
+}, {
+  "timestamp" : 2544319111666,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544319123625,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 11959
+}, {
+  "timestamp" : 2544319141333,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544325418416,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 6277083
+}, {
+  "timestamp" : 2544325444750,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544325453791,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 9041
+}, {
+  "timestamp" : 2544325466291,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-3",
+  "threadId" : 28,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544331792916,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-3",
+  "threadId" : 28,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 6326625
+}, {
+  "timestamp" : 2544331868625,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-3",
+  "threadId" : 28,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544331870625,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-3",
+  "threadId" : 28,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 2000
+}, {
+  "timestamp" : 2544331873791,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544338146875,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 6273084
+}, {
+  "timestamp" : 2544338168666,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544344444833,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 6276167
+}, {
+  "timestamp" : 2544344462041,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544350744208,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 6282167
+}, {
+  "timestamp" : 2544350795541,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544350799375,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 3834
+}, {
+  "timestamp" : 2544350801750,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544356317375,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 5515625
+}, {
+  "timestamp" : 2544356357791,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544361868083,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 5510292
+}, {
+  "timestamp" : 2544361902583,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544367412875,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 5510292
+}, {
+  "timestamp" : 2544367420583,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544367422375,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 1792
+}, {
+  "timestamp" : 2544367425666,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-3",
+  "threadId" : 28,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544372987333,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-3",
+  "threadId" : 28,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 5561667
+}, {
+  "timestamp" : 2544373015333,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-3",
+  "threadId" : 28,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544373022500,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-3",
+  "threadId" : 28,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 7167
+}, {
+  "timestamp" : 2544373032916,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544379316833,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 6283917
+}, {
+  "timestamp" : 2544379343750,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544385634708,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 6290958
+}, {
+  "timestamp" : 2544385656166,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544391938541,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 6282375
+}, {
+  "timestamp" : 2544391956500,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544391963833,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 7333
+}, {
+  "timestamp" : 2544391975416,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544398263750,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 6288334
+}, {
+  "timestamp" : 2544398281458,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544404558708,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 6277250
+}, {
+  "timestamp" : 2544404575083,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544410850791,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 6275708
+}, {
+  "timestamp" : 2544410866291,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544410873166,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 6875
+}, {
+  "timestamp" : 2544410885166,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-3",
+  "threadId" : 28,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544417178375,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-3",
+  "threadId" : 28,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 6293209
+}, {
+  "timestamp" : 2544417197000,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-3",
+  "threadId" : 28,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544417204541,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-3",
+  "threadId" : 28,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 7541
+}, {
+  "timestamp" : 2544417227583,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544422983958,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 5756375
+}, {
+  "timestamp" : 2544423005916,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544429282833,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 6276917
+}, {
+  "timestamp" : 2544429297791,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544435572833,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 6275042
+}, {
+  "timestamp" : 2544435587666,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544435594708,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-1",
+  "threadId" : 26,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 7042
+}, {
+  "timestamp" : 2544435606583,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544441897541,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 6290958
+}, {
+  "timestamp" : 2544441921250,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544448189625,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 6268375
+}, {
+  "timestamp" : 2544448197291,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544454458625,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 6261334
+}, {
+  "timestamp" : 2544454472708,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544454475541,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-2",
+  "threadId" : 27,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 2833
+}, {
+  "timestamp" : 2544454480500,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-3",
+  "threadId" : 28,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544460752125,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-3",
+  "threadId" : 28,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 6271625
+}, {
+  "timestamp" : 2544460765333,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-3",
+  "threadId" : 28,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544460767833,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-3",
+  "threadId" : 28,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 2500
+}, {
+  "timestamp" : 2544460801875,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-3",
+  "threadId" : 28,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544466968416,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-3",
+  "threadId" : 28,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 6166541
+}, {
+  "timestamp" : 2544466975583,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-3",
+  "threadId" : 28,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544466977958,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-3",
+  "threadId" : 28,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 2375
+}, {
+  "timestamp" : 2544467098083,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "main",
+  "threadId" : 3,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544467106291,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "main",
+  "threadId" : 3,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 8208
+}, {
+  "timestamp" : 2544467714625,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "main",
+  "threadId" : 3,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest"
+}, {
+  "timestamp" : 2544467720916,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "main",
+  "threadId" : 3,
+  "lockId" : "lock@6f4696f2",
+  "lockClass" : "com.hecate.testapps.SynchronizedMethodTest",
+  "holdDuration" : 6291
+} ]

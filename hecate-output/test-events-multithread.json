@@ -1,0 +1,65 @@
+[ {
+  "timestamp" : 1000,
+  "eventType" : "THREAD_START",
+  "threadName" : "Thread-1",
+  "threadId" : 1
+}, {
+  "timestamp" : 1100,
+  "eventType" : "THREAD_START",
+  "threadName" : "Thread-2",
+  "threadId" : 2
+}, {
+  "timestamp" : 2000,
+  "eventType" : "LOCK_WAIT",
+  "threadName" : "Thread-1",
+  "threadId" : 1,
+  "lockId" : "lock@xyz",
+  "lockClass" : "BankAccount"
+}, {
+  "timestamp" : 2100,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-1",
+  "threadId" : 1,
+  "lockId" : "lock@xyz",
+  "lockClass" : "BankAccount"
+}, {
+  "timestamp" : 2500,
+  "eventType" : "LOCK_WAIT",
+  "threadName" : "Thread-2",
+  "threadId" : 2,
+  "lockId" : "lock@xyz",
+  "lockClass" : "BankAccount"
+}, {
+  "timestamp" : 3000,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-1",
+  "threadId" : 1,
+  "lockId" : "lock@xyz",
+  "lockClass" : "BankAccount",
+  "holdDuration" : 900
+}, {
+  "timestamp" : 3100,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "Thread-2",
+  "threadId" : 2,
+  "lockId" : "lock@xyz",
+  "lockClass" : "BankAccount"
+}, {
+  "timestamp" : 4000,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "Thread-2",
+  "threadId" : 2,
+  "lockId" : "lock@xyz",
+  "lockClass" : "BankAccount",
+  "holdDuration" : 900
+}, {
+  "timestamp" : 5000,
+  "eventType" : "THREAD_END",
+  "threadName" : "Thread-1",
+  "threadId" : 1
+}, {
+  "timestamp" : 5100,
+  "eventType" : "THREAD_END",
+  "threadName" : "Thread-2",
+  "threadId" : 2
+} ]

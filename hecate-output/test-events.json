@@ -1,0 +1,33 @@
+[ {
+  "timestamp" : 1000,
+  "eventType" : "THREAD_START",
+  "threadName" : "test-thread",
+  "threadId" : 1
+}, {
+  "timestamp" : 2000,
+  "eventType" : "LOCK_WAIT",
+  "threadName" : "test-thread",
+  "threadId" : 1,
+  "lockId" : "lock@abc",
+  "lockClass" : "Object"
+}, {
+  "timestamp" : 3000,
+  "eventType" : "LOCK_ACQUIRE",
+  "threadName" : "test-thread",
+  "threadId" : 1,
+  "lockId" : "lock@abc",
+  "lockClass" : "Object"
+}, {
+  "timestamp" : 4000,
+  "eventType" : "LOCK_RELEASE",
+  "threadName" : "test-thread",
+  "threadId" : 1,
+  "lockId" : "lock@abc",
+  "lockClass" : "Object",
+  "holdDuration" : 1000
+}, {
+  "timestamp" : 5000,
+  "eventType" : "THREAD_END",
+  "threadName" : "test-thread",
+  "threadId" : 1
+} ]
