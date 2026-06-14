@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,10 @@ public class LockStateModel {
     private final List<LockAcquisition> acquisitions = new ArrayList<>();
     private final Set<String> lockKeys = new LinkedHashSet<>();
     private final Set<Long> threadIds = new LinkedHashSet<>();
+    private final Map<Long, String> threadNames = new LinkedHashMap<>();
+    // End-of-trace snapshot, used to detect *live* deadlocks in a hung/interrupted run.
+    private final Map<Long, BlockedThread> blockedThreads = new LinkedHashMap<>();
+    private final Map<String, Long> lockOwnersAtEnd = new LinkedHashMap<>();
     private final LockKeyFn keyFn;
 
     public LockStateModel(List<Event> events) {
@@ -55,13 +60,14 @@ public class LockStateModel {
 
         for (Event e : events) {
             threadIds.add(e.getThreadId());
+            threadNames.putIfAbsent(e.getThreadId(), e.getThreadName());
 
             switch (e.getEventType()) {
                 case LOCK_WAIT: {
                     LockWaitEvent w = (LockWaitEvent) e;
                     String key = keyFn.key(w.getLockId(), w.getLockClass());
                     lockKeys.add(key);
-                    pendingWaits.put(e.getThreadId(), new PendingWait(key, e.getTimestamp()));
+                    pendingWaits.put(e.getThreadId(), new PendingWait(key, w.getLockClass(), e.getTimestamp()));
                     break;
                 }
 
@@ -124,11 +130,24 @@ public class LockStateModel {
             }
         }
 
-        // Locks still held when the trace ended: record them as unreleased acquisitions.
-        for (Deque<OpenAcquisition> held : heldByThread.values()) {
-            for (OpenAcquisition open : held) {
-                acquisitions.add(open.finalizeUnreleased());
+        // Locks still held when the trace ended: record them as unreleased acquisitions, and
+        // remember each lock's owner for the wait-for graph. Their hold time is unknown, so
+        // estimate it as "acquired until end of trace" (a lower bound) rather than zero, which
+        // would otherwise make a deadlocked lock look like infinite contention.
+        long endTs = events.isEmpty() ? 0 : events.get(events.size() - 1).getTimestamp();
+        for (Map.Entry<Long, Deque<OpenAcquisition>> entry : heldByThread.entrySet()) {
+            for (OpenAcquisition open : entry.getValue()) {
+                acquisitions.add(open.finalizeUnreleased(endTs));
+                lockOwnersAtEnd.putIfAbsent(open.lockKey, entry.getKey());
             }
+        }
+
+        // Threads that issued a WAIT but never got the matching ACQUIRE are still blocked when
+        // the trace ended: the signature of a live deadlock in a hung or interrupted run.
+        for (Map.Entry<Long, PendingWait> entry : pendingWaits.entrySet()) {
+            long tid = entry.getKey();
+            PendingWait pw = entry.getValue();
+            blockedThreads.put(tid, new BlockedThread(tid, getThreadName(tid), pw.key, pw.lockClass, pw.timestamp));
         }
 
         acquisitions.sort(Comparator.comparingLong(LockAcquisition::getAcquireTs));
@@ -165,14 +184,73 @@ public class LockStateModel {
         return Collections.unmodifiableSet(threadIds);
     }
 
+    /** Display name for a thread id, or a synthesized fallback if unseen. */
+    public String getThreadName(long threadId) {
+        return threadNames.getOrDefault(threadId, "thread-" + threadId);
+    }
+
+    /**
+     * Threads still blocked on a lock when the trace ended (a WAIT with no matching ACQUIRE),
+     * keyed by thread id. Empty for a run that completed normally.
+     */
+    public Map<Long, BlockedThread> getBlockedThreads() {
+        return Collections.unmodifiableMap(blockedThreads);
+    }
+
+    /** Owner thread id of each lock still held when the trace ended, keyed by lock key. */
+    public Map<String, Long> getLockOwnersAtEnd() {
+        return Collections.unmodifiableMap(lockOwnersAtEnd);
+    }
+
+    /** A thread frozen mid-acquisition at the end of the trace. */
+    public static final class BlockedThread {
+        private final long threadId;
+        private final String threadName;
+        private final String lockKey;
+        private final String lockClass;
+        private final long sinceTs;
+
+        public BlockedThread(long threadId, String threadName, String lockKey, String lockClass, long sinceTs) {
+            this.threadId = threadId;
+            this.threadName = threadName;
+            this.lockKey = lockKey;
+            this.lockClass = lockClass;
+            this.sinceTs = sinceTs;
+        }
+
+        public long getThreadId() {
+            return threadId;
+        }
+
+        public String getThreadName() {
+            return threadName;
+        }
+
+        /** The lock this thread is waiting to acquire. */
+        public String getLockKey() {
+            return lockKey;
+        }
+
+        public String getLockClass() {
+            return lockClass;
+        }
+
+        /** Timestamp of the WAIT that never completed. */
+        public long getSinceTs() {
+            return sinceTs;
+        }
+    }
+
     // ---- internal mutable scratch types ----
 
     private static final class PendingWait {
         final String key;
+        final String lockClass;
         final long timestamp;
 
-        PendingWait(String key, long timestamp) {
+        PendingWait(String key, String lockClass, long timestamp) {
             this.key = key;
+            this.lockClass = lockClass;
             this.timestamp = timestamp;
         }
     }
@@ -191,9 +269,11 @@ public class LockStateModel {
                     waitStartTs, acquireTs, releaseTs, holdDuration, heldWhenAcquired);
         }
 
-        LockAcquisition finalizeUnreleased() {
+        LockAcquisition finalizeUnreleased(long endTs) {
+            // releaseTs stays -1 (never released); holdDuration is a lower-bound estimate.
+            long holdLowerBound = Math.max(0, endTs - acquireTs);
             return new LockAcquisition(lockKey, lockClass, threadId, threadName,
-                    waitStartTs, acquireTs, -1, 0, heldWhenAcquired);
+                    waitStartTs, acquireTs, -1, holdLowerBound, heldWhenAcquired);
         }
     }
 }

@@ -107,7 +107,8 @@ Other demos in [`src/test/java/com/hecate/testapps`](src/test/java/com/hecate/te
 
 | Analyzer | Flags | How |
 |---|---|---|
-| **Deadlock** | Latent circular lock orderings (AB-BA and longer cycles) | iGoodLock |
+| **Potential deadlock** | Latent circular lock orderings (AB-BA and longer) from a run that completed | iGoodLock |
+| **Live deadlock** | Threads actually stuck in a cycle when the trace ended | wait-for graph |
 | **Contention** | Locks that serialize the program | `Σ wait / Σ hold` per lock |
 | **Hold-time** | Abnormally long critical sections (likely I/O under a lock) | hold > `mean + 2σ` |
 | **Fairness** | Thread starvation | Jain's index over per-thread wait |
@@ -152,9 +153,10 @@ Each lock event (`WAIT` / `ACQUIRE` / `RELEASE`) is queued and exported on shutd
 
 **Analysis.** `LockStateModel` replays the timestamp-sorted events once, pairing
 WAIT, ACQUIRE, RELEASE per thread (handling nesting and reentrancy) into immutable
-acquisition records. Four independent analyzers read that shared model.
+acquisition records, and noting which threads were still blocked at the end. Five
+independent analyzers read that shared model.
 
-### The deadlock algorithm (iGoodLock)
+### Potential deadlocks (iGoodLock)
 
 Every nested acquisition becomes a dependency `(thread, lock, locks-already-held)`. The
 analyzer searches for a chain of dependencies that closes into a cycle: thread *i* holds
@@ -166,6 +168,14 @@ the lock thread *i+1* wants. Three filters remove the textbook false positives:
   and the cycle is benign.
 
 The cycle is reported even when the analyzed run completed cleanly.
+
+### Live deadlocks (wait-for graph)
+
+A genuinely deadlocked program never exits, so its trace is written only if you interrupt
+it (Ctrl-C / `SIGTERM` still runs the shutdown hook). In that trace the stuck threads each
+hold one lock and wait on another, which iGoodLock can't see (no nesting ever completes).
+The wait-for-graph analyzer reads the end-of-trace state instead: it draws an edge from
+each blocked thread to whoever holds the lock it wants, and any cycle is a live deadlock.
 
 ---
 
@@ -201,8 +211,8 @@ Requires JDK 11+. CI builds and tests on Java 11, 17, and 21.
 - **Lock identity** uses `System.identityHashCode`, which can collide and be reused after
   GC. Identity is pluggable (`LockKeyFn`); a stabler allocation-site key is the next upgrade.
 - Only the no-arg `tryLock()` is instrumented (not the timed `tryLock(long, TimeUnit)`).
-- Detects *potential* (lock-order) deadlocks. A wait-for-graph pass for *live* deadlocks in
-  a hung trace is a natural addition.
+- A live deadlock is only captured if the hung program is interrupted so its shutdown hook
+  runs (`SIGTERM`/Ctrl-C); a `kill -9` leaves no trace.
 - Analysis is offline; there is no live/streaming mode yet.
 
 ---

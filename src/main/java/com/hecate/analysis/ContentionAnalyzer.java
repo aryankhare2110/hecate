@@ -66,10 +66,10 @@ public class ContentionAnalyzer implements Analyzer {
             details.put("distinctThreads", s.getDistinctThreads());
 
             String summary = String.format(
-                    "Lock %s (%s), contention factor %.3f: %d/%d acquisitions contended across %d threads, %dns total wait vs %dns held",
+                    "Lock %s (%s): contention factor %.2f. %s spent waiting vs %s held (%d of %d acquisitions contended, %d threads).",
                     s.getLockKey(), s.getLockClass(), s.getContentionFactor(),
-                    s.getContendedAcquisitions(), s.getAcquisitions(), s.getDistinctThreads(),
-                    s.getTotalWaitNs(), s.getTotalHoldNs());
+                    Durations.human(s.getTotalWaitNs()), Durations.human(s.getTotalHoldNs()),
+                    s.getContendedAcquisitions(), s.getAcquisitions(), s.getDistinctThreads());
 
             findings.add(new Finding(severityFor(s), "CONTENTION", summary, details));
         }

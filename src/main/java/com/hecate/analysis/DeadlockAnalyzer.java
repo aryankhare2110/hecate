@@ -148,15 +148,18 @@ public class DeadlockAnalyzer implements Analyzer {
                 step.put("holdsLock", holdsLock);
                 step.put("acquiresLock", d.getLockKey());
                 steps.add(step);
-                readable.add(String.format("%s holds %s wants %s", d.getThreadName(), holdsLock, d.getLockKey()));
+                readable.add(String.format("%s holds %s, wants %s", d.getThreadName(), holdsLock, d.getLockKey()));
             }
 
             Map<String, Object> details = new LinkedHashMap<>();
             details.put("lockCycle", cycle.getLockCycle());
             details.put("threadIds", new ArrayList<>(cycle.getThreadIds()));
             details.put("steps", steps);
+            details.put("lines", readable);
 
-            String summary = "Potential deadlock, circular lock order: " + String.join("; ", readable);
+            String summary = String.format(
+                    "Potential deadlock: a circular lock order across %d threads could deadlock under a different schedule.",
+                    n);
             findings.add(new Finding(Finding.Severity.CRITICAL, "DEADLOCK", summary, details));
         }
         return Collections.unmodifiableList(findings);

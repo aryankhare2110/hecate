@@ -48,7 +48,7 @@ class AnalysisEngineTest {
         assertEquals(Finding.Severity.CRITICAL, report.getFindings().get(0).getSeverity());
 
         String text = report.render();
-        assertTrue(text.contains("Hecate Analysis Report"));
+        assertTrue(text.contains("Hecate Concurrency Analysis"));
         assertTrue(text.contains("DEADLOCK"));
     }
 }

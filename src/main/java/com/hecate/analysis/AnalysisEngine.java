@@ -21,6 +21,7 @@ public final class AnalysisEngine {
     /** The standard analyzer set, ordered most-to-least severe for readable reports. */
     public static AnalysisEngine withDefaults() {
         return new AnalysisEngine(Arrays.asList(
+                new WaitForGraphAnalyzer(),
                 new DeadlockAnalyzer(),
                 new ContentionAnalyzer(),
                 new HoldTimeAnalyzer(),

@@ -54,27 +54,50 @@ public final class AnalysisReport {
 
     /** Human-readable report for console output. */
     public String render() {
+        String bar = repeat('=', 64);
+        String rule = repeat('-', 64);
         StringBuilder sb = new StringBuilder();
-        sb.append("\n========== Hecate Analysis Report ==========\n");
-        sb.append(String.format("Events: %s   Locks: %s   Threads: %s   Acquisitions: %s%n",
+
+        sb.append('\n').append(bar).append('\n');
+        sb.append("  Hecate Concurrency Analysis").append('\n');
+        sb.append(bar).append('\n');
+        sb.append(String.format("  Trace      %s events, %s locks, %s threads, %s acquisitions%n",
                 summary.get("events"), summary.get("locks"),
                 summary.get("threads"), summary.get("acquisitions")));
-        sb.append(String.format("Findings: %d  (CRITICAL %d, WARNING %d, INFO %d)%n",
+        sb.append(String.format("  Findings   %d   (%d critical, %d warning, %d info)%n",
                 findings.size(),
                 countBySeverity(Finding.Severity.CRITICAL),
                 countBySeverity(Finding.Severity.WARNING),
                 countBySeverity(Finding.Severity.INFO)));
-        sb.append("--------------------------------------------\n");
 
         if (findings.isEmpty()) {
-            sb.append("No concurrency issues detected.\n");
-        } else {
-            for (Finding f : findings) {
-                sb.append(String.format("[%-8s] %-10s %s%n",
-                        f.getSeverity(), f.getCategory(), f.getSummary()));
+            sb.append(rule).append('\n');
+            sb.append("  No concurrency issues detected.").append('\n');
+            sb.append(bar).append('\n');
+            return sb.toString();
+        }
+
+        int index = 1;
+        for (Finding f : findings) {
+            sb.append('\n');
+            sb.append(String.format("  [%d]  %-8s  %s%n", index++, f.getSeverity(), f.getCategory()));
+            sb.append("       ").append(f.getSummary()).append('\n');
+
+            Object lines = f.getDetails().get("lines");
+            if (lines instanceof List) {
+                for (Object line : (List<?>) lines) {
+                    sb.append("         - ").append(line).append('\n');
+                }
             }
         }
-        sb.append("============================================\n");
+
+        sb.append(bar).append('\n');
         return sb.toString();
+    }
+
+    private static String repeat(char c, int n) {
+        char[] chars = new char[n];
+        java.util.Arrays.fill(chars, c);
+        return new String(chars);
     }
 }

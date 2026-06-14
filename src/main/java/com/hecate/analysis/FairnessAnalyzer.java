@@ -90,9 +90,9 @@ public class FairnessAnalyzer implements Analyzer {
             details.put("perThreadWaitNs", s.getPerThreadWaitNs());
 
             String summary = String.format(
-                    "Lock %s (%s), fairness index %.3f across %d threads: waiting is unevenly distributed (max %dns vs min %dns per thread)",
+                    "Lock %s (%s): uneven wait distribution (fairness index %.2f across %d threads; per-thread waits %s to %s).",
                     s.getLockKey(), s.getLockClass(), s.getJainIndex(), s.getDistinctThreads(),
-                    s.getMaxThreadWaitNs(), s.getMinThreadWaitNs());
+                    Durations.human(s.getMinThreadWaitNs()), Durations.human(s.getMaxThreadWaitNs()));
 
             findings.add(new Finding(severity, "FAIRNESS", summary, details));
         }
