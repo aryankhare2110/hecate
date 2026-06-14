@@ -68,6 +68,18 @@ public class MonitorHelper {
         }
     }
 
+    /**
+     * Records an ACQUIRE only when a {@code tryLock()} actually succeeded. Returns the
+     * original result unchanged so it can sit transparently on the operand stack in place
+     * of the real {@code tryLock()} call.
+     */
+    public static boolean afterTryLock(Object lockObject, boolean acquired) {
+        if (acquired) {
+            afterMonitorEnter(lockObject);
+        }
+        return acquired;
+    }
+
     private static String generateLockId(Object lockObject) {
         if (lockObject == null) {
             return "null-lock";

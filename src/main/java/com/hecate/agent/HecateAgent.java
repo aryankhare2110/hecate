@@ -4,11 +4,8 @@ import com.hecate.events.EventCollector;
 import com.hecate.util.EventExporter;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.asm.Advice;
-import net.bytebuddy.asm.AsmVisitorWrapper;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.DynamicType;
-import net.bytebuddy.jar.asm.MethodVisitor;
-import net.bytebuddy.jar.asm.Opcodes;
 import net.bytebuddy.matcher.ElementMatchers;
 import net.bytebuddy.utility.JavaModule;
 
@@ -24,6 +21,10 @@ public class HecateAgent {
         System.out.println("[Hecate] Runtime concurrency analysis active");
 
         EventCollector.getInstance().startCollecting();
+
+        // Raw-ASM transformer for synchronized blocks and j.u.c Lock calls — reaches lambda
+        // bodies that ByteBuddy's method wrapper skips.
+        inst.addTransformer(new LockClassFileTransformer(), true);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             EventCollector.getInstance().stopCollecting();
@@ -46,20 +47,14 @@ public class HecateAgent {
 
                 .type(ElementMatchers.any())
 
+                // ByteBuddy handles synchronized *methods* (ACC_SYNCHRONIZED has no opcodes to
+                // rewrite, so advice wraps method entry/exit). Synchronized *blocks* and explicit
+                // Lock calls are handled by LockClassFileTransformer below, which — unlike
+                // ByteBuddy's method wrapper — also reaches lambda bodies and constructors.
                 .transform(new AgentBuilder.Transformer() {
                     @Override
                     public DynamicType.Builder<?> transform(DynamicType.Builder<?> builder, TypeDescription typeDescription, ClassLoader classLoader, JavaModule module, ProtectionDomain domain) {
-                        builder = builder.visit(Advice.to(SynchronizedMethodInterceptor.class).on(ElementMatchers.isSynchronized()));
-                        builder = builder
-                                .visit(new AsmVisitorWrapper.ForDeclaredMethods()
-                                        .method(ElementMatchers.any(), new AsmVisitorWrapper.ForDeclaredMethods.MethodVisitorWrapper() {
-                                                    @Override
-                                                    public MethodVisitor wrap(TypeDescription instrumentedType, net.bytebuddy.description. method.MethodDescription instrumentedMethod, MethodVisitor methodVisitor, net.bytebuddy.implementation. Implementation.Context implementationContext, net.bytebuddy.pool.TypePool typePool, int writerFlags, int readerFlags) {
-                                                        return new SynchronizedBlockTransformer(Opcodes.ASM9, methodVisitor);
-                                                    }
-                                                })
-                                );
-                        return builder;
+                        return builder.visit(Advice.to(SynchronizedMethodInterceptor.class).on(ElementMatchers.isSynchronized()));
                     }
                 })
 
