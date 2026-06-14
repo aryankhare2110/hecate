@@ -71,7 +71,7 @@ mvn clean package          # → target/hecate.jar  (also runs the test suite)
 
 ---
 
-## Try it in 30 seconds
+## Demos
 
 The repo ships runnable demos. This one takes two locks in opposite orders across two
 threads, a classic latent deadlock, but runs them sequentially so it never actually hangs:
@@ -171,7 +171,7 @@ The cycle is reported even when the analyzed run completed cleanly.
 
 ## Performance
 
-Measured with `OverheadBenchmark` (4 threads hammering an **empty** `synchronized` block —
+Measured with `OverheadBenchmark` (4 threads hammering an **empty** `synchronized` block,
 the worst case, where lock bookkeeping is 100% of the work):
 
 | | work elapsed |
