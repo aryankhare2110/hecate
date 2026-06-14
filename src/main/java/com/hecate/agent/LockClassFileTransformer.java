@@ -19,7 +19,7 @@ import java.security.ProtectionDomain;
  * {@link ClassReader}/{@link ClassWriter} visits <em>every</em> method, closing that gap.
  *
  * Only linear instructions are inserted and each rewrite is operand-stack-neutral at basic
- * block boundaries, so existing stack-map frames stay valid — the class is copied with
+ * block boundaries, so existing stack-map frames stay valid: the class is copied with
  * {@code ClassWriter(reader, 0)} (no frame recomputation) and {@link LockSiteTransformer}
  * bumps {@code maxStack} itself.
  */
@@ -30,6 +30,11 @@ public class LockClassFileTransformer implements ClassFileTransformer {
             "com/hecate/agent/", "com/hecate/events/", "com/hecate/util/"
     };
 
+    // Class-file layout: bytes 6-7 hold the major version. Java 17 is 61, a version every
+    // recent ASM accepts; used only as a stand-in while reading a too-new class.
+    private static final int MAJOR_VERSION_OFFSET = 6;
+    private static final int JAVA_17_MAJOR = 61;
+
     @Override
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
                             ProtectionDomain protectionDomain, byte[] classfileBuffer) {
@@ -37,7 +42,22 @@ public class LockClassFileTransformer implements ClassFileTransformer {
             return null; // null = leave the class unchanged
         }
         try {
-            ClassReader reader = new ClassReader(classfileBuffer);
+            ClassReader reader;
+            boolean versionPatched = false;
+            try {
+                reader = new ClassReader(classfileBuffer);
+            } catch (IllegalArgumentException tooNew) {
+                // ASM rejects class-file versions newer than it knows (a JDK newer than the
+                // bundled ASM). The bytecode is still parseable, so read it under a version ASM
+                // accepts and restore the real version on the way out. Keeps the agent working
+                // on JDKs released after this build.
+                byte[] downgraded = classfileBuffer.clone();
+                downgraded[MAJOR_VERSION_OFFSET] = 0;
+                downgraded[MAJOR_VERSION_OFFSET + 1] = (byte) JAVA_17_MAJOR;
+                reader = new ClassReader(downgraded);
+                versionPatched = true;
+            }
+
             ClassWriter writer = new ClassWriter(reader, 0);
             boolean[] modified = {false};
 
@@ -52,7 +72,15 @@ public class LockClassFileTransformer implements ClassFileTransformer {
             reader.accept(visitor, 0);
 
             // Untouched classes (the vast majority) keep their original bytes.
-            return modified[0] ? writer.toByteArray() : null;
+            if (!modified[0]) {
+                return null;
+            }
+            byte[] result = writer.toByteArray();
+            if (versionPatched) {
+                result[MAJOR_VERSION_OFFSET] = classfileBuffer[MAJOR_VERSION_OFFSET];
+                result[MAJOR_VERSION_OFFSET + 1] = classfileBuffer[MAJOR_VERSION_OFFSET + 1];
+            }
+            return result;
         } catch (Throwable t) {
             System.err.println("[Hecate] Failed to instrument " + className + ": " + t);
             return null;
