@@ -2,7 +2,7 @@
 
 # Hecate
 
-**Catch JVM concurrency bugs — including deadlocks that never actually happened.**
+**Catch JVM concurrency bugs, including deadlocks that never actually happened.**
 
 Hecate attaches to any Java program, records every lock acquire and release as it runs,
 then analyzes the trace offline to surface deadlocks, lock contention, long critical
@@ -18,14 +18,14 @@ sections, and thread starvation.
 
 ## Why Hecate?
 
-Concurrency bugs are timing-dependent — a deadlock might lurk in your code for months and
+Concurrency bugs are timing-dependent, a deadlock might lurk in your code for months and
 only strike in production under the wrong interleaving. Testing the one execution that
 *didn't* hang tells you nothing.
 
 Hecate's deadlock analysis is **predictive**. From a *single, successful* run it
 reconstructs how your threads order their locks and proves whether a different schedule
 *could* deadlock. That's the difference between *"it didn't crash this time"* and
-*"this code has a latent deadlock — here's the exact cycle."*
+*"this code has a latent deadlock and here's the exact cycle."*
 
 ```
 [CRITICAL] DEADLOCK  Potential deadlock — circular lock order:
@@ -40,24 +40,24 @@ It works on plain `synchronized` (blocks **and** methods, including inside lambd
 
 ## Quick start
 
-Hecate is a single self-contained jar — it's both the **agent** (captures traces) and the
+Hecate is a single self-contained jar, it's both the **agent** (captures traces) and the
 **analyzer** (reads them). No configuration, no code changes to your program.
 
-### Option A — download and run (no build)
+### Option A: download and run (no build)
 
 1. Grab `hecate.jar` from the [latest release](https://github.com/aryankhare2110/hecate/releases/latest).
 2. Run your program with the agent attached, then analyze:
 
 ```bash
-# 1. Capture — attach Hecate to any Java program
+# 1. Capture: attach Hecate to any Java program
 java -javaagent:hecate.jar -jar your-program.jar
 #    → writes hecate-output/hecate-events.json on exit
 
-# 2. Analyze — print the report
+# 2. Analyze: print the report
 java -cp hecate.jar com.hecate.Hecate
 ```
 
-### Option B — build from source
+### Option B: build from source
 
 ```bash
 git clone https://github.com/aryankhare2110/hecate.git
@@ -74,7 +74,7 @@ mvn clean package          # → target/hecate.jar  (also runs the test suite)
 ## Try it in 30 seconds
 
 The repo ships runnable demos. This one takes two locks in opposite orders across two
-threads — a classic latent deadlock — but runs them sequentially so it never actually hangs:
+threads, a classic latent deadlock, but runs them sequentially so it never actually hangs:
 
 ```bash
 java -javaagent:target/hecate.jar \
@@ -118,21 +118,31 @@ Findings are tagged `INFO` / `WARNING` / `CRITICAL` and rendered most-severe-fir
 
 ## How it works
 
-Capture and analysis are **fully decoupled** — the agent only writes a JSON trace; all the
+Capture and analysis are **fully decoupled**, the agent only writes a JSON trace; all the
 reasoning happens offline. So analysis can't perturb or crash your program, traces are
 replayable, and every analyzer is unit-tested against hand-written traces.
 
-```
-  Your JVM                                Offline
- ┌────────────────────────┐            ┌───────────────────────────────┐
- │  -javaagent:hecate.jar │            │  com.hecate.Hecate (CLI)      │
- │   ├ rewrite lock sites  │   JSON     │   └ LockStateModel  (replay)  │
- │   ├ record events   ────┼──────────▶ │       ├ DeadlockAnalyzer      │
- │   └ export on shutdown  │   trace    │       ├ ContentionAnalyzer    │
- └────────────────────────┘            │       ├ HoldTimeAnalyzer      │
-                                        │       └ FairnessAnalyzer      │
-                                        │   └ AnalysisReport (txt/json) │
-                                        └───────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph capture["Your JVM (-javaagent:hecate.jar)"]
+        direction TB
+        A["Rewrite lock sites<br/>(bytecode)"] --> B["Record events<br/>WAIT / ACQUIRE / RELEASE"] --> C["Export on shutdown"]
+    end
+
+    subgraph analysis["Offline (com.hecate.Hecate)"]
+        direction TB
+        M["LockStateModel<br/>replay trace once"]
+        M --> D["DeadlockAnalyzer"]
+        M --> N["ContentionAnalyzer"]
+        M --> H["HoldTimeAnalyzer"]
+        M --> F["FairnessAnalyzer"]
+        D --> R["AnalysisReport<br/>text + JSON"]
+        N --> R
+        H --> R
+        F --> R
+    end
+
+    C -->|"hecate-events.json"| M
 ```
 
 **Capture.** A `ClassFileTransformer` rewrites bytecode as classes load: `synchronized`
