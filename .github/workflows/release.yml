@@ -2,7 +2,7 @@ name: Release
 
 # Push a tag like `v1.0` to build the agent jar and publish it as a downloadable
 # GitHub Release asset:  git tag v1.0 && git push origin v1.0
-
+on:
   push:
     tags: ['v*']
 
