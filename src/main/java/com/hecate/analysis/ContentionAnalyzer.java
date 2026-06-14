@@ -66,7 +66,7 @@ public class ContentionAnalyzer implements Analyzer {
             details.put("distinctThreads", s.getDistinctThreads());
 
             String summary = String.format(
-                    "Lock %s (%s) — contention factor %.3f: %d/%d acquisitions contended across %d threads, %dns total wait vs %dns held",
+                    "Lock %s (%s), contention factor %.3f: %d/%d acquisitions contended across %d threads, %dns total wait vs %dns held",
                     s.getLockKey(), s.getLockClass(), s.getContentionFactor(),
                     s.getContendedAcquisitions(), s.getAcquisitions(), s.getDistinctThreads(),
                     s.getTotalWaitNs(), s.getTotalHoldNs());

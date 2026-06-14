@@ -86,7 +86,7 @@ public class HoldTimeAnalyzer implements Analyzer {
             details.put("outliers", outliers);
 
             String summary = String.format(
-                    "Lock %s (%s) — %d critical section(s) held far longer than typical (max %dns vs mean %.0fns, threshold %.0fns)",
+                    "Lock %s (%s), %d critical section(s) held far longer than typical (max %dns vs mean %.0fns, threshold %.0fns)",
                     s.getLockKey(), s.getLockClass(), outliers.size(), s.getMaxHoldNs(),
                     s.getMeanHoldNs(), threshold);
 

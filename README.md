@@ -18,29 +18,29 @@ sections, and thread starvation.
 
 ## Why Hecate?
 
-Concurrency bugs are timing-dependent, a deadlock might lurk in your code for months and
+Concurrency bugs are timing-dependent. A deadlock might lurk in your code for months and
 only strike in production under the wrong interleaving. Testing the one execution that
 *didn't* hang tells you nothing.
 
 Hecate's deadlock analysis is **predictive**. From a *single, successful* run it
 reconstructs how your threads order their locks and proves whether a different schedule
 *could* deadlock. That's the difference between *"it didn't crash this time"* and
-*"this code has a latent deadlock and here's the exact cycle."*
+*"this code has a latent deadlock, and here's the exact cycle."*
 
 ```
-[CRITICAL] DEADLOCK  Potential deadlock — circular lock order:
+[CRITICAL] DEADLOCK  Potential deadlock, circular lock order:
   Thread-1 holds lock@226f0381 wants lock@26aa642e;
   Thread-2 holds lock@26aa642e wants lock@226f0381
 ```
 
 It works on plain `synchronized` (blocks **and** methods, including inside lambdas) and on
-`java.util.concurrent.locks` (`ReentrantLock`, `ReentrantReadWriteLock`, …).
+`java.util.concurrent.locks` (`ReentrantLock`, `ReentrantReadWriteLock`, and friends).
 
 ---
 
 ## Quick start
 
-Hecate is a single self-contained jar, it's both the **agent** (captures traces) and the
+Hecate is a single self-contained jar. It's both the **agent** (captures traces) and the
 **analyzer** (reads them). No configuration, no code changes to your program.
 
 ### Option A: download and run (no build)
@@ -51,7 +51,7 @@ Hecate is a single self-contained jar, it's both the **agent** (captures traces)
 ```bash
 # 1. Capture: attach Hecate to any Java program
 java -javaagent:hecate.jar -jar your-program.jar
-#    → writes hecate-output/hecate-events.json on exit
+#    writes hecate-output/hecate-events.json on exit
 
 # 2. Analyze: print the report
 java -cp hecate.jar com.hecate.Hecate
@@ -62,7 +62,7 @@ java -cp hecate.jar com.hecate.Hecate
 ```bash
 git clone https://github.com/aryankhare2110/hecate.git
 cd hecate
-mvn clean package          # → target/hecate.jar  (also runs the test suite)
+mvn clean package          # produces target/hecate.jar, also runs the test suite
 ```
 
 > **Heads-up:** the trace is written by a JVM shutdown hook, so the target program must
@@ -89,9 +89,9 @@ java -cp target/hecate.jar com.hecate.Hecate
 Events: 14   Locks: 2   Threads: 3   Acquisitions: 5
 Findings: 4  (CRITICAL 2, WARNING 0, INFO 2)
 --------------------------------------------
-[CRITICAL] DEADLOCK   Potential deadlock — circular lock order: Thread-1 holds … wants …; Thread-2 holds … wants …
-[CRITICAL] FAIRNESS   Lock … (ReentrantLock) — fairness index 0.381 across 3 threads …
-[INFO    ] CONTENTION Lock … (ReentrantLock) — contention factor 0.018 …
+[CRITICAL] DEADLOCK   Potential deadlock, circular lock order: Thread-1 holds … wants …; Thread-2 holds … wants …
+[CRITICAL] FAIRNESS   Lock … (ReentrantLock), fairness index 0.381 across 3 threads …
+[INFO    ] CONTENTION Lock … (ReentrantLock), contention factor 0.018 …
 ============================================
 ```
 
@@ -118,7 +118,7 @@ Findings are tagged `INFO` / `WARNING` / `CRITICAL` and rendered most-severe-fir
 
 ## How it works
 
-Capture and analysis are **fully decoupled**, the agent only writes a JSON trace; all the
+Capture and analysis are **fully decoupled**. The agent only writes a JSON trace; all the
 reasoning happens offline. So analysis can't perturb or crash your program, traces are
 replayable, and every analyzer is unit-tested against hand-written traces.
 
@@ -151,18 +151,18 @@ tiny callback wrapped around them; `synchronized` methods are handled with ByteB
 Each lock event (`WAIT` / `ACQUIRE` / `RELEASE`) is queued and exported on shutdown.
 
 **Analysis.** `LockStateModel` replays the timestamp-sorted events once, pairing
-WAIT→ACQUIRE→RELEASE per thread (handling nesting and reentrancy) into immutable acquisition
-records. Four independent analyzers read that shared model.
+WAIT, ACQUIRE, RELEASE per thread (handling nesting and reentrancy) into immutable
+acquisition records. Four independent analyzers read that shared model.
 
 ### The deadlock algorithm (iGoodLock)
 
 Every nested acquisition becomes a dependency `(thread, lock, locks-already-held)`. The
-analyzer searches for a chain of dependencies that closes into a cycle — thread *i* holds
+analyzer searches for a chain of dependencies that closes into a cycle: thread *i* holds
 the lock thread *i+1* wants. Three filters remove the textbook false positives:
 
-- **Reentrancy** — a lock can't depend on itself.
-- **Distinct threads** — a single thread's lock order can't deadlock against itself.
-- **Gate locks** — if a shared outer lock guards the whole cycle, it serializes the threads
+- **Reentrancy** : a lock can't depend on itself.
+- **Distinct threads** : a single thread's lock order can't deadlock against itself.
+- **Gate locks** : if a shared outer lock guards the whole cycle, it serializes the threads
   and the cycle is benign.
 
 The cycle is reported even when the analyzed run completed cleanly.
@@ -180,8 +180,8 @@ the worst case, where lock bookkeeping is 100% of the work):
 | with agent | ~190 ms |
 
 That's **~0.86 µs of overhead per lock acquisition** (three events recorded each). For real
-critical sections doing actual work (µs–ms), that's well under 1%; the ~10× only appears in
-a degenerate tight loop locking around nothing.
+critical sections doing actual work (microseconds to milliseconds), that's well under 1%.
+The ~10x figure only appears in a degenerate tight loop locking around nothing.
 
 ---
 
@@ -201,9 +201,9 @@ Requires JDK 11+. CI builds and tests on Java 11, 17, and 21.
 - **Lock identity** uses `System.identityHashCode`, which can collide and be reused after
   GC. Identity is pluggable (`LockKeyFn`); a stabler allocation-site key is the next upgrade.
 - Only the no-arg `tryLock()` is instrumented (not the timed `tryLock(long, TimeUnit)`).
-- Detects *potential* (lock-order) deadlocks; a wait-for-graph pass for *live* deadlocks in
+- Detects *potential* (lock-order) deadlocks. A wait-for-graph pass for *live* deadlocks in
   a hung trace is a natural addition.
-- Analysis is offline — there is no live/streaming mode yet.
+- Analysis is offline; there is no live/streaming mode yet.
 
 ---
 

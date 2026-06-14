@@ -156,7 +156,7 @@ public class DeadlockAnalyzer implements Analyzer {
             details.put("threadIds", new ArrayList<>(cycle.getThreadIds()));
             details.put("steps", steps);
 
-            String summary = "Potential deadlock — circular lock order: " + String.join("; ", readable);
+            String summary = "Potential deadlock, circular lock order: " + String.join("; ", readable);
             findings.add(new Finding(Finding.Severity.CRITICAL, "DEADLOCK", summary, details));
         }
         return Collections.unmodifiableList(findings);
