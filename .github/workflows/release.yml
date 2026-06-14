@@ -1,0 +1,28 @@
+name: Release
+
+# Push a tag like `v1.0` to build the agent jar and publish it as a downloadable
+# GitHub Release asset:  git tag v1.0 && git push origin v1.0
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+      - name: Build agent jar
+        run: mvn -B clean package
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: target/hecate.jar
+          generate_release_notes: true
