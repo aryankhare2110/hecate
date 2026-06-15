@@ -4,10 +4,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * A single result produced by an {@link Analyzer}: a severity-tagged observation with
- * a human-readable summary and a structured details map (the latter feeds JSON reports).
- */
 public final class Finding {
 
     public enum Severity {
@@ -47,3 +43,11 @@ public final class Finding {
         return String.format("[%s] %s: %s", severity, category, summary);
     }
 }
+
+/*
+ * Notes
+ * - A single result from an Analyzer: a Severity, a category tag, a human-readable summary, and
+ *   a structured details map.
+ * - The details map feeds the JSON report and may carry a "lines" list, which the text report
+ *   renders as indented sub-bullets (used for deadlock cycle steps).
+ */

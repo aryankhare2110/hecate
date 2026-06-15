@@ -9,26 +9,6 @@ import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
-/**
- * Predicts deadlocks the run never actually hit, using the iGoodLock algorithm.
- *
- * <p>Every nested acquisition becomes a {@link LockDependency} {@code (thread, lock, held)}.
- * The analyzer then searches for a chain of dependencies that closes into a cycle — e.g.
- * one thread takes A then B while another takes B then A. Such opposite orderings can
- * deadlock under the right interleaving even if this particular execution serialized
- * cleanly, which is exactly what makes the detector valuable as a testing tool.
- *
- * <p>Three filters keep the result free of the classic false positives:
- * <ul>
- *   <li><b>Reentrancy</b> — a lock is removed from its own held set, so re-locking an
- *       already-held monitor never forms an edge.</li>
- *   <li><b>Distinct threads</b> — every dependency in a cycle must come from a different
- *       thread; a single thread's lock order can't deadlock against itself.</li>
- *   <li><b>Gate locks</b> — the held sets along the cycle must be pairwise disjoint. If
- *       two threads share an outer "gate" lock, that lock serializes them and the cycle
- *       is benign.</li>
- * </ul>
- */
 public class DeadlockAnalyzer implements Analyzer {
 
     @Override
@@ -36,14 +16,12 @@ public class DeadlockAnalyzer implements Analyzer {
         return "Deadlock Analyzer";
     }
 
-    /** Builds the deduplicated lock-dependency set from the model. */
     public Set<LockDependency> buildDependencies(LockStateModel model) {
         Set<LockDependency> deps = new LinkedHashSet<>();
         for (LockAcquisition acq : model.getAcquisitions()) {
             if (acq.getHeldWhenAcquired().isEmpty()) {
                 continue;
             }
-            // Reentrancy filter: a lock can't depend on itself.
             Set<String> held = new LinkedHashSet<>(acq.getHeldWhenAcquired());
             held.remove(acq.getLockKey());
             if (held.isEmpty()) {
@@ -55,7 +33,6 @@ public class DeadlockAnalyzer implements Analyzer {
         return deps;
     }
 
-    /** All distinct potential-deadlock cycles in the trace. */
     public List<DeadlockCycle> computeCycles(LockStateModel model) {
         List<LockDependency> deps = new ArrayList<>(buildDependencies(model));
         List<DeadlockCycle> cycles = new ArrayList<>();
@@ -80,9 +57,6 @@ public class DeadlockAnalyzer implements Analyzer {
                         List<DeadlockCycle> out) {
         LockDependency last = chain.get(chain.size() - 1);
 
-        // Closing condition: the first dependency holds the lock the last one acquired,
-        // completing the wait-for loop. Distinctness and gate-disjointness are already
-        // guaranteed incrementally, so any closed chain of length >= 2 is a real cycle.
         if (chain.size() >= 2 && chain.get(0).getHeldLocks().contains(last.getLockKey())) {
             DeadlockCycle cycle = new DeadlockCycle(chain);
             if (seen.add(cycle.signature())) {
@@ -92,22 +66,21 @@ public class DeadlockAnalyzer implements Analyzer {
 
         for (LockDependency d : all) {
             if (threadsUsed.contains(d.getThreadId())) {
-                continue; // distinct-thread filter
+                continue;
             }
             if (locksUsed.contains(d.getLockKey())) {
-                continue; // keep cycles simple
+                continue;
             }
             if (!d.getHeldLocks().contains(last.getLockKey())) {
-                continue; // connectivity: the next thread must hold the lock we just acquired
+                continue;
             }
             if (!disjoint(heldUnion, d.getHeldLocks())) {
-                continue; // gate-lock filter: a shared held lock serializes the threads
+                continue;
             }
 
             chain.add(d);
             threadsUsed.add(d.getThreadId());
             locksUsed.add(d.getLockKey());
-            // Held sets along the chain are pairwise disjoint, so these elements are new.
             heldUnion.addAll(d.getHeldLocks());
 
             search(chain, threadsUsed, locksUsed, heldUnion, all, seen, out);
@@ -165,3 +138,20 @@ public class DeadlockAnalyzer implements Analyzer {
         return Collections.unmodifiableList(findings);
     }
 }
+
+/*
+ * Notes
+ * - Predicts deadlocks a clean run never hit (the iGoodLock algorithm). Every nested
+ *   acquisition becomes a LockDependency: (thread, lock, locks-already-held).
+ * - buildDependencies drops self-dependencies (reentrancy): the acquired lock is removed from
+ *   its own held set, so re-locking an already-held lock never forms an edge.
+ * - computeCycles runs a backtracking search for a chain of dependencies that closes into a
+ *   cycle, deduped by cycle.signature(). A chain closes when the first dependency holds the lock
+ *   the last one acquired.
+ * - Three filters applied while extending the chain remove the textbook false positives:
+ *     - distinct threads: each dependency must come from a new thread,
+ *     - connectivity: the next thread must already hold the lock just acquired,
+ *     - gate locks: held sets along the chain stay pairwise disjoint (disjoint() vs heldUnion),
+ *       so a shared outer lock that serializes the threads makes the cycle benign.
+ * - analyze() turns each cycle into a CRITICAL Finding, with per-thread "lines" for the report.
+ */

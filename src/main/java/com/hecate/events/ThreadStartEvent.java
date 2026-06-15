@@ -8,7 +8,13 @@ public class ThreadStartEvent extends Event{
 
     @Override
     public String toString() {
-        return super.toString() + " – Thread started";
+        return super.toString() + " - Thread started";
     }
 
 }
+
+/*
+ * Notes
+ * - Marks a thread starting. Part of the event model and round-trips through JSON, but the
+ *   agent does not emit it yet, so it does not appear in captured traces today.
+ */

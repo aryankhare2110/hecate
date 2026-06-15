@@ -46,3 +46,12 @@ public class EventExporter {
     }
 
 }
+
+/*
+ * Notes
+ * - Writes a list of events to hecate-output/<filename> as indented JSON via Jackson, creating
+ *   the directory if needed. The agent calls exportToFile(events, "hecate-events.json") from
+ *   its shutdown hook.
+ * - The polymorphic type info on Event is what lets EventLoader read the concrete subtypes back.
+ */
+

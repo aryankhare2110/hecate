@@ -68,11 +68,6 @@ public class MonitorHelper {
         }
     }
 
-    /**
-     * Records an ACQUIRE only when a {@code tryLock()} actually succeeded. Returns the
-     * original result unchanged so it can sit transparently on the operand stack in place
-     * of the real {@code tryLock()} call.
-     */
     public static boolean afterTryLock(Object lockObject, boolean acquired) {
         if (acquired) {
             afterMonitorEnter(lockObject);
@@ -90,3 +85,19 @@ public class MonitorHelper {
     }
 
 }
+
+/*
+ * Notes
+ * - The callbacks injected at every instrumented lock site. They run on the host program's own
+ *   threads, so the state is concurrent and every method swallows Throwable to never break the
+ *   host.
+ * - beforeMonitorEnter records WAIT; afterMonitorEnter records ACQUIRE and remembers the acquire
+ *   time keyed by "threadId:lockId"; beforeMonitorExit records RELEASE and computes the hold
+ *   duration from that remembered time.
+ * - The same three methods serve both synchronized blocks and j.u.c lock()/unlock().
+ *   afterTryLock records an ACQUIRE only when tryLock() returned true, passing the boolean
+ *   result straight through.
+ * - lockId is identityHashCode-based, the project's single (collision-prone) lock identity.
+ * - Known wrinkle: the acquire-time map keys on lock id only, so a reentrant re-acquire
+ *   overwrites the outer acquire time, and the outer release then reports a short or zero hold.
+ */

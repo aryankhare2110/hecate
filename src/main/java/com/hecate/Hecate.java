@@ -12,16 +12,6 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
 
-/**
- * Command-line entry point for Hecate's offline analysis engine.
- *
- * <pre>
- *   java -cp hecate.jar com.hecate.Hecate [traceFile] [--json &lt;outFile&gt;]
- * </pre>
- *
- * {@code traceFile} is either a direct path or a filename under {@code hecate-output/}
- * (default: {@code hecate-events.json}, which is what the agent writes on shutdown).
- */
 public class Hecate {
 
     private static final String DEFAULT_TRACE = "hecate-events.json";
@@ -49,7 +39,7 @@ public class Hecate {
         }
 
         if (events.isEmpty()) {
-            System.out.println("[Hecate] Trace contains no events — nothing to analyze.");
+            System.out.println("[Hecate] Trace contains no events, nothing to analyze.");
             return;
         }
 
@@ -78,3 +68,14 @@ public class Hecate {
         }
     }
 }
+
+/*
+ * Notes
+ * - Command-line entry point for the offline analyzer:
+ *     java -cp hecate.jar com.hecate.Hecate [traceFile] [--json <outFile>]
+ * - traceFile is a direct path or a name resolved under hecate-output/ (default
+ *   hecate-events.json, which the agent writes on shutdown). --json also writes the structured
+ *   report.
+ * - Builds a LockStateModel from the loaded events and runs AnalysisEngine.withDefaults(),
+ *   printing the rendered report.
+ */

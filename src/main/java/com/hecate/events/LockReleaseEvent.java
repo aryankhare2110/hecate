@@ -26,6 +26,14 @@ public class LockReleaseEvent extends Event{
     }
 
     public String toString() {
-        return super.toString() + String.format(" –  Released lock %s (%s) held for %d ns", lockId, lockClass, holdDuration);
+        return super.toString() + String.format(" - Released lock %s (%s) held for %d ns", lockId, lockClass, holdDuration);
     }
 }
+
+/*
+ * Notes
+ * - Emitted when a thread gives up a lock (before MONITOREXIT, or before Lock.unlock()).
+ * - holdDuration is the nanoseconds held, computed by MonitorHelper from the matching acquire
+ *   time. A lock still held at the end of the trace produces no RELEASE; LockStateModel then
+ *   estimates its hold as acquire-to-end-of-trace.
+ */

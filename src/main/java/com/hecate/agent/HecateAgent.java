@@ -21,9 +21,6 @@ public class HecateAgent {
         System.out.println("[Hecate] Runtime concurrency analysis active");
 
         EventCollector.getInstance().startCollecting();
-
-        // Raw-ASM transformer for synchronized blocks and j.u.c Lock calls — reaches lambda
-        // bodies that ByteBuddy's method wrapper skips.
         inst.addTransformer(new LockClassFileTransformer(), true);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -47,10 +44,6 @@ public class HecateAgent {
 
                 .type(ElementMatchers.any())
 
-                // ByteBuddy handles synchronized *methods* (ACC_SYNCHRONIZED has no opcodes to
-                // rewrite, so advice wraps method entry/exit). Synchronized *blocks* and explicit
-                // Lock calls are handled by LockClassFileTransformer below, which — unlike
-                // ByteBuddy's method wrapper — also reaches lambda bodies and constructors.
                 .transform(new AgentBuilder.Transformer() {
                     @Override
                     public DynamicType.Builder<?> transform(DynamicType.Builder<?> builder, TypeDescription typeDescription, ClassLoader classLoader, JavaModule module, ProtectionDomain domain) {
@@ -89,3 +82,17 @@ public class HecateAgent {
 
     }
 }
+
+/*
+ * Notes
+ * - premain is the Java agent entry point. It enables ByteBuddy experimental mode (so newer
+ *   JDKs are accepted), starts the EventCollector, registers the LockClassFileTransformer, and
+ *   adds a shutdown hook that exports the captured trace to hecate-output/hecate-events.json.
+ * - Lock instrumentation is split in two: ByteBuddy advice (SynchronizedMethodInterceptor)
+ *   handles synchronized methods, while the raw-ASM LockClassFileTransformer handles
+ *   synchronized blocks and java.util.concurrent Lock calls (it reaches lambda bodies, which
+ *   ByteBuddy's method wrapper silently skips).
+ * - ignore(...) keeps instrumentation off the JDK, ByteBuddy, and Hecate's own packages so the
+ *   agent never rewrites itself or core classes.
+ * - The Listener prints each instrumented type and reports any instrumentation error.
+ */

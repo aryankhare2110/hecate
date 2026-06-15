@@ -1,10 +1,5 @@
 package com.hecate.analysis;
 
-/**
- * Aggregated contention metrics for a single lock, computed by {@link ContentionAnalyzer}.
- * Exposed as a value object so callers (and tests) can read exact numbers without
- * parsing a {@link Finding}.
- */
 public final class LockContentionStats {
 
     private final String lockKey;
@@ -69,11 +64,6 @@ public final class LockContentionStats {
         return avgWaitNs;
     }
 
-    /**
-     * Total time threads spent blocked on this lock divided by total time it was held.
-     * 0 means uncontended; values approaching/exceeding 1.0 mean threads spend as much
-     * time queueing for the lock as the lock is actually used — a serialization bottleneck.
-     */
     public double getContentionFactor() {
         return contentionFactor;
     }
@@ -85,3 +75,12 @@ public final class LockContentionStats {
                 contendedAcquisitions, acquisitions, distinctThreads);
     }
 }
+
+/*
+ * Notes
+ * - Aggregated contention metrics for one lock, computed by ContentionAnalyzer. A value object
+ *   so callers and tests can read exact numbers without parsing a Finding.
+ * - contentionFactor = totalWaitNs / totalHoldNs: 0 is uncontended; values near or above 1.0
+ *   mean threads queue for the lock about as long as it is actually used, a serialization
+ *   bottleneck.
+ */

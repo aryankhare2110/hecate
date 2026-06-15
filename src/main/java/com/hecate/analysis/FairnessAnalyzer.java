@@ -6,21 +6,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Detects thread starvation: locks where the waiting burden falls disproportionately on
- * some threads while others sail through.
- *
- * For each lock it sums every thread's total wait time, then computes Jain's fairness
- * index over those per-thread totals. An index near {@code 1/n} means one thread is
- * absorbing nearly all the contention — a starvation signal that raw averages hide.
- *
- * Only locks contended by at least two threads, with non-zero total wait, are scored.
- */
 public class FairnessAnalyzer implements Analyzer {
 
-    /** Below this index a lock is flagged WARNING (some imbalance). */
     private static final double WARNING_THRESHOLD = 0.8;
-    /** Below this index a lock is flagged CRITICAL (severe starvation). */
     private static final double CRITICAL_THRESHOLD = 0.5;
 
     @Override
@@ -28,9 +16,7 @@ public class FairnessAnalyzer implements Analyzer {
         return "Fairness Analyzer";
     }
 
-    /** Per-lock fairness stats for every lock with multi-thread contention, least-fair first. */
     public List<FairnessStats> computeStats(LockStateModel model) {
-        // lockKey -> (threadId -> total wait)
         Map<String, Map<Long, Long>> waitByLockThread = new LinkedHashMap<>();
         Map<String, String> lockClasses = new LinkedHashMap<>();
 
@@ -44,7 +30,7 @@ public class FairnessAnalyzer implements Analyzer {
         for (Map.Entry<String, Map<Long, Long>> e : waitByLockThread.entrySet()) {
             Map<Long, Long> perThread = e.getValue();
             if (perThread.size() < 2) {
-                continue; // fairness needs at least two contenders
+                continue;
             }
             long total = 0;
             long max = Long.MIN_VALUE;
@@ -57,10 +43,9 @@ public class FairnessAnalyzer implements Analyzer {
                 sumSq += (double) w * w;
             }
             if (total == 0) {
-                continue; // no contention on this lock -> trivially fair, nothing to report
+                continue;
             }
             int n = perThread.size();
-            // Jain's fairness index: (sum)^2 / (n * sumOfSquares)
             double jain = ((double) total * total) / (n * sumSq);
 
             stats.add(new FairnessStats(e.getKey(), lockClasses.get(e.getKey()), n, jain,
@@ -76,7 +61,7 @@ public class FairnessAnalyzer implements Analyzer {
         for (FairnessStats s : computeStats(model)) {
             Finding.Severity severity = severityFor(s.getJainIndex());
             if (severity == Finding.Severity.INFO) {
-                continue; // fair enough; don't clutter the report
+                continue;
             }
 
             Map<String, Object> details = new LinkedHashMap<>();
@@ -109,3 +94,16 @@ public class FairnessAnalyzer implements Analyzer {
         return Finding.Severity.INFO;
     }
 }
+
+/*
+ * Notes
+ * - Detects thread starvation: locks where the waiting burden falls on some threads while
+ *   others sail through.
+ * - For each lock it sums each thread's total wait time, then computes Jain's fairness index
+ *   over those per-thread totals: (sum)^2 / (n * sumOfSquares). The index runs from 1/n (one
+ *   thread absorbs all the waiting) up to 1.0 (perfectly even).
+ * - Only locks contended by at least two threads with non-zero total wait are scored; others
+ *   are trivially fair and skipped.
+ * - Severity: index < 0.5 CRITICAL, < 0.8 WARNING, otherwise INFO. analyze() drops INFO so a
+ *   fair lock does not clutter the report.
+ */

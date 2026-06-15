@@ -5,11 +5,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Runs a set of {@link Analyzer}s over a single {@link LockStateModel} and collects their
- * findings into an {@link AnalysisReport}. Analyzers are independent, so registering a new
- * one here is the only wiring a new analysis needs.
- */
 public final class AnalysisEngine {
 
     private final List<Analyzer> analyzers;
@@ -18,7 +13,6 @@ public final class AnalysisEngine {
         this.analyzers = Collections.unmodifiableList(new ArrayList<>(analyzers));
     }
 
-    /** The standard analyzer set, ordered most-to-least severe for readable reports. */
     public static AnalysisEngine withDefaults() {
         return new AnalysisEngine(Arrays.asList(
                 new WaitForGraphAnalyzer(),
@@ -40,3 +34,12 @@ public final class AnalysisEngine {
         return new AnalysisReport(model, all);
     }
 }
+
+/*
+ * Notes
+ * - Runs a set of Analyzers over one LockStateModel and collects their findings into an
+ *   AnalysisReport.
+ * - withDefaults() is the standard set, ordered so the report reads most-to-least severe:
+ *   live deadlock, potential deadlock, contention, hold-time, fairness.
+ * - Analyzers are independent, so registering a new one here is the only wiring it needs.
+ */

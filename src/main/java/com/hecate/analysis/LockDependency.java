@@ -5,15 +5,6 @@ import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
-/**
- * A single observed lock-ordering fact: thread {@code threadId} acquired {@code lockKey}
- * while already holding the locks in {@code heldLocks}. This is the unit the iGoodLock
- * deadlock search chains together — equivalent to the dependency tuple {@code (t, l, L)}
- * in the literature.
- *
- * Two dependencies are equal when thread, acquired lock, and held set all match, so
- * repeated identical nestings collapse to one.
- */
 public final class LockDependency {
 
     private final long threadId;
@@ -47,7 +38,6 @@ public final class LockDependency {
         return lockClass;
     }
 
-    /** Locks this thread already held when it acquired {@link #getLockKey()}. */
     public Set<String> getHeldLocks() {
         return heldLocks;
     }
@@ -76,3 +66,11 @@ public final class LockDependency {
         return String.format("(%s/%d acquires %s holding %s)", threadName, threadId, lockKey, heldLocks);
     }
 }
+
+/*
+ * Notes
+ * - A single observed lock-ordering fact: thread threadId acquired lockKey while already holding
+ *   the locks in heldLocks. The unit the iGoodLock search chains together (the (t, l, L) tuple).
+ * - equals/hashCode use thread, acquired lock, and held set, so repeated identical nestings
+ *   collapse to one dependency.
+ */

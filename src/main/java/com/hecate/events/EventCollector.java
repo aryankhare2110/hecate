@@ -48,3 +48,14 @@ public class EventCollector {
     }
 
 }
+
+/*
+ * Notes
+ * - Process-wide singleton sink for events. Instrumented application threads call recordEvent
+ *   concurrently, so the backing store is a lock-free ConcurrentLinkedQueue.
+ * - collecting is a volatile on/off flag toggled by the agent's premain and shutdown hook;
+ *   events recorded while it is false are dropped.
+ * - getEvents() returns a timestamp-sorted copy, a stable snapshot for export and analysis.
+ * - Limitation: the queue is unbounded and held entirely in memory until shutdown, so a very
+ *   long or extremely lock-heavy run can make it large.
+ */

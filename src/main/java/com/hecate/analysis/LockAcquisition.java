@@ -3,22 +3,17 @@ package com.hecate.analysis;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * One reconstructed lock-hold interval: a single ACQUIRE paired with its matching
- * WAIT (if any) and RELEASE (if observed). This is the atomic unit every analyzer
- * consumes — produced once by {@link LockStateModel}.
- */
 public final class LockAcquisition {
 
     private final String lockKey;
     private final String lockClass;
     private final long threadId;
     private final String threadName;
-    private final long waitStartTs;   // -1 if no matching WAIT was observed
+    private final long waitStartTs;
     private final long acquireTs;
-    private final long releaseTs;     // -1 if the lock was still held at end of trace
-    private final long holdDuration;  // nanoseconds, from the RELEASE event; 0 if unreleased
-    private final List<String> heldWhenAcquired; // lock keys this thread already held (for lock-order graph)
+    private final long releaseTs;
+    private final long holdDuration;
+    private final List<String> heldWhenAcquired;
 
     public LockAcquisition(String lockKey, String lockClass, long threadId, String threadName,
                            long waitStartTs, long acquireTs, long releaseTs, long holdDuration,
@@ -66,22 +61,18 @@ public final class LockAcquisition {
         return holdDuration;
     }
 
-    /** Lock keys already held by this thread at the moment of acquisition (outermost first). */
     public List<String> getHeldWhenAcquired() {
         return heldWhenAcquired;
     }
 
-    /** Time spent blocked before acquiring, or 0 if no WAIT was observed. */
     public long getWaitDuration() {
         return waitStartTs >= 0 ? acquireTs - waitStartTs : 0;
     }
 
-    /** True if the thread actually blocked (waited a non-zero amount) before acquiring. */
     public boolean isContended() {
         return getWaitDuration() > 0;
     }
 
-    /** True if a matching RELEASE was observed within the trace. */
     public boolean isReleased() {
         return releaseTs >= 0;
     }
@@ -92,3 +83,15 @@ public final class LockAcquisition {
                 lockKey, threadName, threadId, getWaitDuration(), holdDuration);
     }
 }
+
+/*
+ * Notes
+ * - One reconstructed lock-hold interval: a single ACQUIRE paired with its matching WAIT (if
+ *   any) and RELEASE (if observed). The atomic unit every analyzer consumes, produced by
+ *   LockStateModel.
+ * - waitStartTs is -1 when no matching WAIT was seen; releaseTs is -1 when the lock was still
+ *   held at end of trace, in which case holdDuration is a lower-bound estimate.
+ * - heldWhenAcquired lists the locks this thread already held at the moment of acquisition
+ *   (outermost first), which the deadlock analyzer turns into lock-order dependencies.
+ * - Derived views: getWaitDuration(), isContended() (waited a non-zero amount), isReleased().
+ */

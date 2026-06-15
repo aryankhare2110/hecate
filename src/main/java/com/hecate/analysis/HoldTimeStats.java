@@ -1,9 +1,5 @@
 package com.hecate.analysis;
 
-/**
- * Aggregated hold-time distribution for a single lock, computed by {@link HoldTimeAnalyzer}.
- * All durations are nanoseconds.
- */
 public final class HoldTimeStats {
 
     private final String lockKey;
@@ -72,3 +68,9 @@ public final class HoldTimeStats {
                 lockKey, lockClass, count, meanHoldNs, medianHoldNs, p95HoldNs, maxHoldNs, stdDevHoldNs);
     }
 }
+
+/*
+ * Notes
+ * - Aggregated hold-time distribution for one lock (count, total, mean, median, p95, max, and
+ *   population standard deviation), computed by HoldTimeAnalyzer. All durations are nanoseconds.
+ */

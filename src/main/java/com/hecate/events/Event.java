@@ -49,3 +49,11 @@ public class Event {
         return String.format("[%d] %s (Thread: %s/%d)", timestamp, eventType, threadName, threadId);
     }
 }
+
+/*
+ * Notes
+ * - Base type for every captured event: a nanosecond timestamp, the EventType, and the thread
+ *   name and id. Subtypes add lock-specific or thread-specific fields.
+ * - Jackson polymorphism: @JsonTypeInfo writes a "type" property and @JsonSubTypes maps each
+ *   name to its concrete class, so traces serialize and reload without losing the subtype.
+ */

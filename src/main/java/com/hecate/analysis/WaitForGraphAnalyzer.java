@@ -7,19 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Detects deadlocks that were <em>actually happening</em> when the trace ended, by building
- * a wait-for graph from the end-of-trace state.
- *
- * <p>Where {@link DeadlockAnalyzer} (iGoodLock) <em>predicts</em> deadlocks from a run that
- * completed, this analyzer catches a run that hung: take a trace of a deadlocked program
- * (interrupt it so the shutdown hook still writes the trace) and the threads frozen
- * mid-acquisition form a cycle here.
- *
- * <p>Each blocked thread waits on exactly one lock, so the graph has out-degree at most one:
- * thread T (waiting on lock L held by thread U) yields edge {@code T -> U}. Any cycle in
- * that graph is a live deadlock.
- */
 public class WaitForGraphAnalyzer implements Analyzer {
 
     @Override
@@ -27,12 +14,10 @@ public class WaitForGraphAnalyzer implements Analyzer {
         return "Live Deadlock Analyzer";
     }
 
-    /** Each detected live-deadlock cycle, as an ordered list of thread ids. */
     public List<List<Long>> computeCycles(LockStateModel model) {
         Map<Long, LockStateModel.BlockedThread> blocked = model.getBlockedThreads();
         Map<String, Long> owners = model.getLockOwnersAtEnd();
 
-        // Build the wait-for edges: blocked thread -> thread holding the lock it wants.
         Map<Long, Long> waitsFor = new LinkedHashMap<>();
         for (LockStateModel.BlockedThread b : blocked.values()) {
             Long owner = owners.get(b.getLockKey());
@@ -42,7 +27,7 @@ public class WaitForGraphAnalyzer implements Analyzer {
         }
 
         List<List<Long>> cycles = new ArrayList<>();
-        Set<Long> settled = new HashSet<>(); // threads already assigned to a cycle or proven acyclic
+        Set<Long> settled = new HashSet<>();
 
         for (Long start : waitsFor.keySet()) {
             if (settled.contains(start)) {
@@ -53,7 +38,6 @@ public class WaitForGraphAnalyzer implements Analyzer {
             Long node = start;
             while (node != null && !settled.contains(node)) {
                 if (onPath.contains(node)) {
-                    // Found a cycle: the suffix of the path from `node` back to itself.
                     cycles.add(new ArrayList<>(path.subList(path.indexOf(node), path.size())));
                     break;
                 }
@@ -105,3 +89,16 @@ public class WaitForGraphAnalyzer implements Analyzer {
         return findings;
     }
 }
+
+/*
+ * Notes
+ * - Detects deadlocks that were actually happening when the trace ended, by building a wait-for
+ *   graph from LockStateModel's end-of-trace state.
+ * - Complements DeadlockAnalyzer: iGoodLock predicts deadlocks from a run that completed; this
+ *   catches a run that hung (interrupt it so the shutdown hook still writes the trace).
+ * - Each blocked thread waits on exactly one lock, so the graph has out-degree at most one:
+ *   thread T waiting on a lock held by thread U gives the edge T -> U. computeCycles walks these
+ *   single-successor chains and records any node that loops back onto its own path.
+ * - analyze() reports each cycle as a CRITICAL "DEADLOCK (LIVE)" Finding, with per-thread
+ *   "lines" naming who is blocked on what and who holds it.
+ */

@@ -9,20 +9,6 @@ import net.bytebuddy.jar.asm.Opcodes;
 import java.lang.instrument.ClassFileTransformer;
 import java.security.ProtectionDomain;
 
-/**
- * Instruments {@code synchronized} blocks and {@code java.util.concurrent.locks.Lock}
- * call sites by rewriting bytecode with raw ASM.
- *
- * Why not ByteBuddy's {@code AsmVisitorWrapper.ForDeclaredMethods}? It silently skips
- * synthetic methods (lambda bodies) and constructors, so any lock taken inside a lambda
- * went uninstrumented. A plain {@link ClassFileTransformer} driving an ASM
- * {@link ClassReader}/{@link ClassWriter} visits <em>every</em> method, closing that gap.
- *
- * Only linear instructions are inserted and each rewrite is operand-stack-neutral at basic
- * block boundaries, so existing stack-map frames stay valid: the class is copied with
- * {@code ClassWriter(reader, 0)} (no frame recomputation) and {@link LockSiteTransformer}
- * bumps {@code maxStack} itself.
- */
 public class LockClassFileTransformer implements ClassFileTransformer {
 
     private static final String[] IGNORED_PREFIXES = {
@@ -30,8 +16,6 @@ public class LockClassFileTransformer implements ClassFileTransformer {
             "com/hecate/agent/", "com/hecate/events/", "com/hecate/util/"
     };
 
-    // Class-file layout: bytes 6-7 hold the major version. Java 17 is 61, a version every
-    // recent ASM accepts; used only as a stand-in while reading a too-new class.
     private static final int MAJOR_VERSION_OFFSET = 6;
     private static final int JAVA_17_MAJOR = 61;
 
@@ -39,7 +23,7 @@ public class LockClassFileTransformer implements ClassFileTransformer {
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
                             ProtectionDomain protectionDomain, byte[] classfileBuffer) {
         if (className == null || isIgnored(className)) {
-            return null; // null = leave the class unchanged
+            return null; 
         }
         try {
             ClassReader reader;
@@ -47,10 +31,6 @@ public class LockClassFileTransformer implements ClassFileTransformer {
             try {
                 reader = new ClassReader(classfileBuffer);
             } catch (IllegalArgumentException tooNew) {
-                // ASM rejects class-file versions newer than it knows (a JDK newer than the
-                // bundled ASM). The bytecode is still parseable, so read it under a version ASM
-                // accepts and restore the real version on the way out. Keeps the agent working
-                // on JDKs released after this build.
                 byte[] downgraded = classfileBuffer.clone();
                 downgraded[MAJOR_VERSION_OFFSET] = 0;
                 downgraded[MAJOR_VERSION_OFFSET + 1] = (byte) JAVA_17_MAJOR;
@@ -70,8 +50,6 @@ public class LockClassFileTransformer implements ClassFileTransformer {
                 }
             };
             reader.accept(visitor, 0);
-
-            // Untouched classes (the vast majority) keep their original bytes.
             if (!modified[0]) {
                 return null;
             }
@@ -96,3 +74,20 @@ public class LockClassFileTransformer implements ClassFileTransformer {
         return false;
     }
 }
+
+/*
+ * Notes
+ * - A raw java.lang.instrument ClassFileTransformer that rewrites synchronized blocks and
+ *   j.u.c Lock call sites by driving an ASM ClassReader -> ClassWriter over every method.
+ * - Used instead of ByteBuddy's AsmVisitorWrapper.ForDeclaredMethods, which silently skips
+ *   synthetic (lambda) methods and constructors, leaving locks in lambdas uninstrumented.
+ * - ClassWriter(reader, 0) means no frame recomputation. The inserted code is operand-stack
+ *   neutral at basic-block boundaries, so existing stack-map frames stay valid;
+ *   LockSiteTransformer bumps maxStack itself.
+ * - Version handling: if ASM rejects a too-new class file (a JDK newer than the bundled ASM),
+ *   the major version (bytes 6-7) is temporarily lowered to Java 17 for reading and restored on
+ *   the output. This keeps the agent working on future JDKs, e.g. Java 25 (version 69).
+ * - Returns null (leave the class unchanged) for ignored packages, unmodified classes, or any
+ *   error, so instrumentation never breaks the host program.
+ */
+

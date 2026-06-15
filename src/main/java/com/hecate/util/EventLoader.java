@@ -132,3 +132,13 @@ public class EventLoader {
         return events;
     }
 }
+
+/*
+ * Notes
+ * - Reads a JSON event array back into Event objects. loadFromFile(String) resolves the name
+ *   under hecate-output/; loadFromFile(File) reads any path.
+ * - deserializeEvent is a hand-rolled, lenient parser: it keys off the "eventType" field,
+ *   checks the required fields per type, and skips (logs and returns null for) any malformed
+ *   entry rather than failing the whole load.
+ * - loadAndSummarize also prints per-type counts for a quick overview of a trace.
+ */

@@ -7,20 +7,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Surfaces locks held for abnormally long, and the individual critical sections
- * responsible. Long holds block every other contender, so an outlier hold is a prime
- * suspect for I/O or heavy work performed inside a {@code synchronized} region.
- *
- * Per lock it builds the hold-time distribution, then flags any acquisition whose hold
- * exceeds {@code mean + OUTLIER_SIGMA * stddev} (only when there is a real distribution
- * to compare against: at least {@code MIN_SAMPLES} holds with non-zero variance).
- */
 public class HoldTimeAnalyzer implements Analyzer {
 
-    /** How many standard deviations above the mean counts as an outlier hold. */
     private static final double OUTLIER_SIGMA = 2.0;
-    /** Minimum acquisitions before outlier detection is meaningful. */
     private static final int MIN_SAMPLES = 3;
 
     @Override
@@ -28,7 +17,6 @@ public class HoldTimeAnalyzer implements Analyzer {
         return "Hold-Time Analyzer";
     }
 
-    /** Per-lock hold-time distribution, ranked by total time held (most first). */
     public List<HoldTimeStats> computeStats(LockStateModel model) {
         Map<String, List<LockAcquisition>> byLock = new LinkedHashMap<>();
         for (LockAcquisition acq : model.getAcquisitions()) {
@@ -116,7 +104,7 @@ public class HoldTimeAnalyzer implements Analyzer {
             double d = h - mean;
             variance += d * d;
         }
-        variance /= n; // population variance
+        variance /= n;
         double stdDev = Math.sqrt(variance);
 
         double median = percentileInterpolatedMedian(holds);
@@ -146,3 +134,16 @@ public class HoldTimeAnalyzer implements Analyzer {
         return sorted.get(idx);
     }
 }
+
+/*
+ * Notes
+ * - Surfaces locks held abnormally long and the individual critical sections responsible. A
+ *   long hold blocks every other contender, so an outlier hold is a prime suspect for I/O or
+ *   heavy work inside a locked region.
+ * - Per lock, toStats builds the hold-time distribution (total, mean, median, p95, max, and
+ *   population standard deviation).
+ * - analyze flags any acquisition whose hold exceeds mean + 2*stddev, but only when there is a
+ *   real distribution to compare against: at least MIN_SAMPLES holds with non-zero variance.
+ *   This avoids false positives on uniform or tiny samples.
+ * - Each flagged lock becomes one WARNING Finding listing its outlier acquisitions.
+ */

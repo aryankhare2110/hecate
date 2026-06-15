@@ -8,19 +8,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-/**
- * Ranks locks by how much they serialize the program.
- *
- * For each lock it sums the time threads spent blocked waiting for it (from the
- * WAIT&rarr;ACQUIRE gap reconstructed in {@link LockStateModel}) against the time the
- * lock was actually held, yielding a {@code contentionFactor = totalWait / totalHold}.
- * Pure O(n) aggregation over the acquisition list.
- */
 public class ContentionAnalyzer implements Analyzer {
 
-    /** Contention factor at/above which a lock is flagged WARNING. */
     private static final double WARNING_THRESHOLD = 0.25;
-    /** Contention factor at/above which a lock is flagged CRITICAL. */
     private static final double CRITICAL_THRESHOLD = 1.0;
 
     @Override
@@ -28,10 +18,6 @@ public class ContentionAnalyzer implements Analyzer {
         return "Contention Analyzer";
     }
 
-    /**
-     * Computes per-lock contention stats, ranked most-contended first.
-     * Exposed separately from {@link #analyze} so callers can read exact metrics.
-     */
     public List<LockContentionStats> computeStats(LockStateModel model) {
         Map<String, Accumulator> byLock = new LinkedHashMap<>();
 
@@ -124,3 +110,17 @@ public class ContentionAnalyzer implements Analyzer {
         }
     }
 }
+
+/*
+ * Notes
+ * - Ranks locks by how much they serialize the program.
+ * - Per lock, sums the wait time (the WAIT to ACQUIRE gap from LockStateModel) against the
+ *   time the lock was held: contentionFactor = totalWait / totalHold. One O(n) pass.
+ * - computeStats() returns exact per-lock metrics, ranked most-contended first; analyze()
+ *   wraps each into a Finding with a readable summary.
+ * - Severity: factor >= 1.0 is CRITICAL, >= 0.25 is WARNING, otherwise INFO.
+ * - totalHold == 0 gives factor 0 (no waits) or +Infinity (waits but no hold). In practice
+ *   the model's lower-bound hold on locks still held at trace end avoids the +Infinity case.
+ * - Accumulator is the per-lock running tally; threads is a set so distinct-thread count is
+ *   exact.
+ */

@@ -34,5 +34,18 @@ public class SynchronizedMethodInterceptor {
         }
     }
 
-
 }
+
+/*
+ * Notes
+ * - ByteBuddy @Advice woven around synchronized methods (matched by isSynchronized in
+ *   HecateAgent). Advice bodies are inlined into the target class, so this code stays
+ *   self-contained and references no shared private helpers.
+ * - onEnter records a LOCK_ACQUIRE and returns the enter timestamp; onExit (also on a thrown
+ *   Throwable) records a LOCK_RELEASE with the hold duration computed from that timestamp.
+ * - lockObject is the monitor: the instance for an instance method, or null for a static
+ *   synchronized method (reported as "static-lock"). lockId uses identityHashCode, matching
+ *   MonitorHelper's scheme so block and method locks share identities.
+ * - All work is wrapped in try/catch so instrumentation never breaks the host program.
+ */
+

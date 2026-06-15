@@ -4,14 +4,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * Per-lock fairness summary computed by {@link FairnessAnalyzer}.
- *
- * {@code jainIndex} is Jain's fairness index over each thread's total wait time for the
- * lock: it ranges from {@code 1/n} (one thread absorbs all the waiting — maximal
- * starvation) up to {@code 1.0} (every thread waits equally). Lower means some thread is
- * being starved relative to its peers.
- */
 public final class FairnessStats {
 
     private final String lockKey;
@@ -64,7 +56,6 @@ public final class FairnessStats {
         return minThreadWaitNs;
     }
 
-    /** Total wait time accumulated by each thread on this lock. */
     public Map<Long, Long> getPerThreadWaitNs() {
         return perThreadWaitNs;
     }
@@ -75,3 +66,12 @@ public final class FairnessStats {
                 lockKey, lockClass, jainIndex, distinctThreads, minThreadWaitNs, maxThreadWaitNs, totalWaitNs);
     }
 }
+
+/*
+ * Notes
+ * - Per-lock fairness summary computed by FairnessAnalyzer.
+ * - jainIndex is Jain's fairness index over each thread's total wait time for the lock: it runs
+ *   from 1/n (one thread absorbs all the waiting, maximal starvation) up to 1.0 (every thread
+ *   waits equally). Lower means some thread is starved relative to its peers.
+ * - perThreadWaitNs is the total wait each thread accumulated on this lock.
+ */

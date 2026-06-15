@@ -7,11 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * The combined output of an {@link AnalysisEngine} run: a trace-level summary plus every
- * {@link Finding} the registered analyzers produced. Serializes cleanly to JSON (via its
- * getters) and renders to a console-friendly report.
- */
 public final class AnalysisReport {
 
     private final Map<String, Object> summary;
@@ -27,7 +22,6 @@ public final class AnalysisReport {
         this.summary = Collections.unmodifiableMap(s);
 
         List<Finding> sorted = new ArrayList<>(findings);
-        // Most severe first; analyzers contribute in registration order within a severity.
         sorted.sort(Comparator.comparingInt((Finding f) -> severityRank(f.getSeverity())));
         this.findings = Collections.unmodifiableList(sorted);
     }
@@ -52,7 +46,6 @@ public final class AnalysisReport {
         }
     }
 
-    /** Human-readable report for console output. */
     public String render() {
         String bar = repeat('=', 64);
         String rule = repeat('-', 64);
@@ -101,3 +94,13 @@ public final class AnalysisReport {
         return new String(chars);
     }
 }
+
+/*
+ * Notes
+ * - The combined output of an AnalysisEngine run: a trace-level summary plus every Finding,
+ *   sorted most-severe-first. Serializes to JSON via its getters and renders a console report.
+ * - render() prints a header, the trace and findings counts, then each finding numbered with its
+ *   severity and category; a finding's "lines" detail (if present) is shown as indented
+ *   sub-bullets.
+ * - repeat() builds the separator bars.
+ */

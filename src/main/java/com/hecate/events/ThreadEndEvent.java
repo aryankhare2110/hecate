@@ -8,7 +8,13 @@ public class ThreadEndEvent extends Event{
 
     @Override
     public String toString() {
-        return super.toString() + " – Thread ended";
+        return super.toString() + " - Thread ended";
     }
 
 }
+
+/*
+ * Notes
+ * - Marks a thread ending. Part of the event model and round-trips through JSON, but the agent
+ *   does not emit it yet, so it does not appear in captured traces today.
+ */
