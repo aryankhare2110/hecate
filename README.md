@@ -52,13 +52,18 @@ Hecate is a single self-contained jar. It's both the **agent** (captures traces)
 2. Run your program with the agent attached, then analyze:
 
 ```bash
-# 1. Capture: attach Hecate to any Java program
+# 1. Capture: attach Hecate to any Java program (replace your-program.jar with your app)
 java -javaagent:hecate.jar -jar your-program.jar
-#    writes hecate-output/hecate-events.json on exit
+#    for a plain compiled class instead of a runnable jar, launch it with -cp:
+#    java -javaagent:hecate.jar -cp . YourMainClass
+#    either way it writes hecate-output/hecate-events.json on exit
 
-# 2. Analyze: print the report
+# 2. Analyze: print the report (run from the same folder)
 java -cp hecate.jar com.hecate.Hecate
 ```
+
+> `your-program.jar` is a placeholder: use `-jar` for a runnable jar, or `-cp <dir> <MainClass>`
+> for loose `.class` files.
 
 ### Option B: build from source
 
